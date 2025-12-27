@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Funny Mamta Page</title>
+  <style>
+    body { font-family: Arial; text-align:center; background:#fce4ec; }
+    h1 { cursor:pointer; font-size:40px; margin-top:40px; }
+    #stage { height:200px; border:2px dashed #ff4081; margin:20px auto; width:80%; position:relative; overflow:hidden; }
+    .emoji { position:absolute; font-size:30px; animation:bounce 1s infinite alternate; }
+    @keyframes bounce { to { transform:translateY(-40px); } }
+    button { padding:10px 20px; background:#ff4081; color:white; border:0; border-radius:8px; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+  <h1 id="title">Mamta is PAGAL SAYANi 😂🤡🤪</h1>
+
+  <button onclick="addEmoji()">Add Funny Emoji</button>
+
+  <div id="stage"></div>
+
+<script>
+const emojis = ["🤣","🤪","😜","🙃","🥳","👻","🐒","🔥","🍕"];
+function addEmoji(){
+  const e = document.createElement("div");
+  e.className = "emoji";
+  e.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  e.style.left = Math.random()*80 + "%";
+  e.style.top = "140px";
+  document.getElementById("stage").appendChild(e);
+}
+document.getElementById("title").onclick = ()=>{
+  document.getElementById("title").style.transform = "rotate(5deg)";
+  setTimeout(()=>document.getElementById("title").style.transform="rotate(0deg)",200);
+};
+</script>
+
+</body>
+</html>

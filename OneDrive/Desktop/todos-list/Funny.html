@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Funny Page — Mamta is PAGAL SAYANi</title>
+  <style>
+    :root{
+      --bg1:#0f172a; --bg2:#0b1220; --accent:#ff6b6b; --glass: rgba(255,255,255,0.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#e6eef8;background:linear-gradient(135deg,var(--bg1),var(--bg2));}
+
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:32px}
+    .card{
+      width:960px;max-width:95%;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border-radius:18px;padding:28px;box-shadow:0 10px 30px rgba(2,6,23,0.6);backdrop-filter: blur(6px);
+    }
+
+    header{display:flex;align-items:center;gap:18px;margin-bottom:18px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#ffd86b,#ff6b6b);display:flex;align-items:center;justify-content:center;font-weight:700;color:#14213d}
+    h1{margin:0;font-size:22px}
+    p.lead{margin:0;color:#bcd1ef}
+
+    .main-hero{display:flex;gap:24px;align-items:center}
+    .hero-left{flex:1}
+    .hero-right{width:340px;display:flex;flex-direction:column;gap:12px}
+
+    .phrase{
+      font-weight:900;font-size:48px;line-height:1.02;letter-spacing:1px;color:white;margin:0 0 12px;display:flex;flex-wrap:wrap;gap:12px;align-items:center
+    }
+    .phrase .word{
+      padding:8px 14px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.0));box-shadow:inset 0 -4px 12px rgba(255,255,255,0.02);
+      transform-origin:center;transition:transform .22s ease,filter .22s ease
+    }
+    .phrase .word:hover{transform:translateY(-6px) rotate(-3deg) scale(1.03);filter:brightness(1.12)}
+
+    .highlight{background:linear-gradient(90deg,#ff9a9e,#fad0c4);color:#14213d}
+    .caps{font-variant:small-caps}
+
+    .emoji-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .emoji-btn{cursor:pointer;padding:8px 12px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.03);font-size:20px}
+    .controls{display:flex;flex-wrap:wrap;gap:8px}
+    button.btn{cursor:pointer;padding:10px 12px;border-radius:10px;border:0;background:#0b2038;color:#e6eef8;font-weight:600}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.05)}
+
+    .stage{min-height:180px;border-radius:12px;padding:18px;background:linear-gradient(180deg, rgba(0,0,0,0.15), rgba(255,255,255,0.02));position:relative;overflow:hidden}
+    .floating-emoji{position:absolute;font-size:36px;cursor:grab;user-select:none;touch-action:none;transition:transform .12s linear}
+    .floating-emoji:active{cursor:grabbing}
+
+    /* Confetti pieces */
+    .confetti{position:absolute;width:10px;height:14px;opacity:0.95;border-radius:2px;animation:fall linear forwards}
+    @keyframes fall{to{transform:translateY(120vh) rotate(720deg);opacity:0}}
+
+    footer{margin-top:14px;display:flex;justify-content:space-between;align-items:center;color:#9fb0d9;font-size:13px}
+
+    @media (max-width:720px){.phrase{font-size:28px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="logo">😜</div>
+        <div>
+          <h1>Playful page — make it silly!</h1>
+          <p class="lead">Interactive page with emojis, confetti & draggable silliness.</p>
+        </div>
+      </header>
+
+      <section class="main-hero">
+        <div class="hero-left">
+          <div class="phrase" id="phrase">
+            <span class="word">Mamta</span>
+            <span class="word highlight">is</span>
+            <span class="word caps" id="bigText">PAGAL SAYANi</span>
+            <span class="word" id="spark">✨</span>
+          </div>
+
+          <div class="controls">
+            <button class="btn" id="toggleCase">Toggle Case</button>
+            <button class="btn ghost" id="addEmoji">Add Random Emoji</button>
+            <button class="btn" id="shuffleEmojis">Shuffle Emoji Styles</button>
+            <button class="btn" id="confettiBtn">Confetti!</button>
+            <button class="btn" id="singBtn">Make it Sing 🎶</button>
+          </div>
+
+          <div style="margin-top:12px">
+            <div style="font-size:14px;color:#9fb0d9">Quick emojis (click to drop onto the stage):</div>
+            <div class="emoji-row" id="emojiBank">
+              <!-- Buttons injected by JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <div class="stage" id="stage" aria-label="Play stage">
+            <!-- Draggable emojis appear here -->
+          </div>
+
+          <footer>
+            <div>Tip: drag emojis around. Click the big text to wiggle it.</div>
+            <div>Made with 😀</div>
+          </footer>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // emoji bank
+    const EMOJIS = ['🤪','🤡','😜','😂','🥳','🙃','😹','🫠','😆','😝','🤭','👻','🦄','🐵','🍕','🌭','💥','🎉','🎈','🔥'];
+
+    const emojiBank = document.getElementById('emojiBank');
+    const stage = document.getElementById('stage');
+    const addEmojiBtn = document.getElementById('addEmoji');
+    const toggleCaseBtn = document.getElementById('toggleCase');
+    const shuffleBtn = document.getElementById('shuffleEmojis');
+    const confettiBtn = document.getElementById('confettiBtn');
+    const singBtn = document.getElementById('singBtn');
+    const phrase = document.getElementById('phrase');
+    const bigText = document.getElementById('bigText');
+
+    // populate quick emoji buttons
+    function buildEmojiButtons(){
+      emojiBank.innerHTML = '';
+      EMOJIS.slice(0,12).forEach(e=>{
+        const b = document.createElement('button');
+        b.className = 'emoji-btn';
+        b.textContent = e;
+        b.title = 'Click to drop ' + e;
+        b.addEventListener('click', ()=>dropEmoji(e));
+        emojiBank.appendChild(b);
+      });
+    }
+
+    buildEmojiButtons();
+
+    // Drop emoji onto the stage at random location
+    function dropEmoji(emoji){
+      const el = document.createElement('div');
+      el.className = 'floating-emoji';
+      el.textContent = emoji;
+      const size = 28 + Math.floor(Math.random()*36);
+      el.style.fontSize = size + 'px';
+      // random position within stage
+      const r = stage.getBoundingClientRect();
+      const x = Math.floor(Math.random()*(r.width - 40));
+      const y = Math.floor(Math.random()*(r.height - 40));
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      // small rotation
+      el.style.transform = 'rotate(' + (Math.random()*30-15) + 'deg)';
+
+      makeDraggable(el);
+
+      // playful wiggle on click
+      el.addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        el.animate([
+          { transform: el.style.transform + ' translateY(0)' },
+          { transform: el.style.transform + ' translateY(-10px) rotate(10deg)' },
+          { transform: el.style.transform + ' translateY(0) rotate(-6deg)' }
+        ], { duration: 450, easing: 'ease-out' });
+      });
+
+      stage.appendChild(el);
+
+      // remove after some time to keep stage tidy
+      setTimeout(()=>{
+        if(el.parentNode) el.parentNode.removeChild(el);
+      }, 90_000);
+    }
+
+    addEmojiBtn.addEventListener('click', ()=>{
+      const e = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+      dropEmoji(e);
+    });
+
+    // Toggle case for the big text
+    toggleCaseBtn.addEventListener('click', ()=>{
+      const txt = bigText.textContent;
+      const toggled = isUpper(txt) ? txt.toLowerCase() : txt.toUpperCase();
+      bigText.textContent = toggled;
+      // quick color flash
+      bigText.animate([{filter:'brightness(1.0)'},{filter:'brightness(1.6)'},{filter:'brightness(1.0)'}],{duration:350});
+    });
+
+    function isUpper(s){ return s === s.toUpperCase(); }
+
+    // shuffle emoji button styles
+    shuffleBtn.addEventListener('click', ()=>{
+      document.querySelectorAll('.floating-emoji').forEach(el=>{
+        el.style.left = Math.random()*(stage.clientWidth-40) + 'px';
+        el.style.top = Math.random()*(stage.clientHeight-40) + 'px';
+        el.style.transform = 'rotate(' + (Math.random()*60-30) + 'deg) scale(' + (0.8+Math.random()*0.6) + ')';
+      });
+    });
+
+    // make elements draggable (pointer events)
+    function makeDraggable(node){
+      let offsetX=0, offsetY=0, startX=0, startY=0;
+      let dragging=false;
+
+      node.addEventListener('pointerdown', (e)=>{
+        node.setPointerCapture(e.pointerId);
+        dragging=true;
+        startX = e.clientX; startY = e.clientY;
+        offsetX = parseFloat(node.style.left) || 0;
+        offsetY = parseFloat(node.style.top) || 0;
+        node.style.transition = 'none';
+      });
+      window.addEventListener('pointermove', (e)=>{
+        if(!dragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        node.style.left = Math.max(0, Math.min(stage.clientWidth-30, offsetX + dx)) + 'px';
+        node.style.top = Math.max(0, Math.min(stage.clientHeight-30, offsetY + dy)) + 'px';
+      });
+      window.addEventListener('pointerup', (e)=>{
+        if(dragging){
+          dragging=false; node.releasePointerCapture?.(e.pointerId);
+          node.style.transition = '';
+        }
+      });
+    }
+
+    // confetti generator (simple)
+    function spawnConfetti(count=80){
+      const colors = ['#ff6b6b','#ffd86b','#6bffb3','#6bd3ff','#c86bff'];
+      for(let i=0;i<count;i++){
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random()*100 + '%';
+        c.style.top = '-10%';
+        c.style.width = Math.floor(6+Math.random()*10)+'px';
+        c.style.height = Math.floor(8+Math.random()*14)+'px';
+        c.style.background = colors[Math.floor(Math.random()*colors.length)];
+        c.style.opacity = 0.9;
+        c.style.animationDuration = (2 + Math.random()*2) + 's';
+        c.style.transform = 'translateY(0) rotate(' + (Math.random()*360) + 'deg)';
+        stage.appendChild(c);
+        // remove when animation done
+        setTimeout(()=>{ c.remove(); }, 4200);
+      }
+    }
+
+    confettiBtn.addEventListener('click', ()=>spawnConfetti(90));
+
+    // tiny synth: simple beep melody
+    function singShortMelody(){
+      try{
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const notes = [440,550,660,880];
+        let t = ctx.currentTime;
+        notes.forEach((n, i)=>{
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sine'; o.frequency.value = n;
+          g.gain.value = 0.0001; // start tiny
+          o.connect(g); g.connect(ctx.destination);
+          o.start(t + i*0.12);
+          g.gain.linearRampToValueAtTime(0.12, t + i*0.12 + 0.02);
+          g.gain.linearRampToValueAtTime(0.0001, t + i*0.12 + 0.11);
+          o.stop(t + i*0.12 + 0.13);
+        })
+      }catch(e){ console.warn('Audio not available', e); }
+    }
+
+    singBtn.addEventListener('click', ()=>singShortMelody());
+
+    // make the main phrase wiggle on click
+    phrase.addEventListener('click', ()=>{
+      phrase.animate([
+        { transform: 'translateX(0) rotate(0deg)' },
+        { transform: 'translateX(-12px) rotate(-6deg)' },
+        { transform: 'translateX(8px) rotate(6deg)' },
+        { transform: 'translateX(0) rotate(0deg)' }
+      ], {duration:500, easing:'ease-out'});
+      spawnConfetti(30);
+    });
+
+    // initialize with a few emojis on the stage
+    for(let i=0;i<6;i++) dropEmoji(EMOJIS[Math.floor(Math.random()*EMOJIS.length)]);
+
+    // shuffle styles for emoji buttons
+    shuffleBtn.addEventListener('click', ()=>{
+      document.querySelectorAll('.emoji-btn').forEach(b=>{
+        b.style.transform = 'rotate(' + (Math.random()*30-15) + 'deg) scale(' + (0.9 + Math.random()*0.4) + ')';
+      });
+    });
+
+    // accessibility: keyboard shortcut to add emoji: press E
+    window.addEventListener('keydown', (e)=>{
+      if(e.key.toLowerCase() === 'e') addEmojiBtn.click();
+      if(e.key === 'c') confettiBtn.click();
+    });
+
+    // small responsive fix: ensure stage size for calculations
+    window.addEventListener('resize', ()=>{});
+  </script>
+</body>
+</html>

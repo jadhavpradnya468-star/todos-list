@@ -58,7 +58,7 @@ todos-list/
 ### 1️⃣ Clone the repository
 
 ```bash
-git clone https://github.com/your-username/todos-list.git
+git clone https://github.com/jadhavpradnya468-star/todos-list.git
 ```
 
 ### 2️⃣ Go to project directory
